@@ -2,10 +2,9 @@
 #include <vector>
 
 using namespace std;
-using query = pair<int, int>;
 int R, C, Q;
 vector<vector<int>> adjacent;
-vector<query> queries;
+vector<int> nodeComponent;
 
 void dfsTimerParent(const vector<vector<int>> &adj, const int source,
                     int &currentTime, vector<int> &timeIn, vector<int> &color, vector<int> &parent) {
@@ -20,33 +19,47 @@ void dfsTimerParent(const vector<vector<int>> &adj, const int source,
     color[source] = 2;
 }
 
-void bridgeDetection(const vector<vector<int>> &adj, int source, const vector<int> &timeIn,
-                     const vector<int> &parents, const vector<bool> &bridgeWithParent) {
+int bridgeDetection(const vector<vector<int>> &adj, int source, const vector<int> &timeIn,
+                     const vector<int> &parents, vector<vector<int>> &bridges) {
+    int count = 0;
     for (int u : adj[source]) {
         if (parents[u] == source) {
-            bridgeDetection(adj, u, timeIn, parents, bridgeWithParent);
+            bridgeDetection(adj, u, timeIn, parents, bridges);
         } else {
-            if (timeIn[source] > timeIn[u] && parents[source] != u) {
-                // TODO
+            // (source, u) is a back-edge going up
+            if (timeIn[source] > timeIn[u] and parents[source] != u) {
+                count++;
+            }
+            // (source, u) is a back-edge ending in source
+            if (timeIn[source] < timeIn[u]) {
+                count--;
             }
         }
     }
+    if (count == 0 and parents[source] != source) {
+        // (parents[source], source) is a bridge edge
+        bridges[parents[source]].push_back(source);
+        bridges[source].push_back(parents[source]);
+    }
+    return count;
 }
 
-bool hedgeMazeSolver() {
-    vector<int> nodeTimeIn(R);
-    vector<int> nodeColor(R);
-    vector<int> nodeParent(R);
+void processHedgeMaze(vector<int> &component) {
+    vector<int> nodeTimeIn(R + 1);
+    vector<int> nodeColor(R + 1);
+    vector<int> nodeParent(R + 1);
     int currentTime = 0;
-    dfsTimerParent(adjacent, 0, currentTime, nodeTimeIn, nodeColor, nodeParent);
-    // TODO
-    return true;
+    dfsTimerParent(adjacent, 1, currentTime, nodeTimeIn, nodeColor, nodeParent);
+
+    vector<vector<int>> bridges(R, vector<int>());
+    bridgeDetection(adjacent, 1, nodeTimeIn, nodeParent, bridges);
+
+    // TODO: agregar algoritmo de detección de componentes conexas usando DFS
 }
 
 int main() {
     while(cin >> R >> C >> Q) {
-        queries = vector<query>(Q, make_pair(0,0));
-        adjacent = vector<vector<int>>(R);
+        adjacent = vector<vector<int>>(R, vector<int>());
         for (int i = 0; i < C; i++) {
             int u;
             int v;
@@ -54,15 +67,18 @@ int main() {
             adjacent[u].push_back(v);
             adjacent[v].push_back(u);
         }
+
+        nodeComponent = vector<int>(R, 0);
+        processHedgeMaze(nodeComponent);
+
         for (int i = 0; i < Q; i++) {
             int s;
             int t;
             cin >> s >> t;
-            queries[i].first = s;
-            queries[i].second = t;
+            cout << ((nodeComponent[s] == nodeComponent[t]) ? 'Y' : 'N') << endl;
         }
 
-        cout << hedgeMazeSolver() << endl;
+        cout << '-' << endl;
     }
     return 0;
 }
