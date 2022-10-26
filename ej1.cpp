@@ -44,17 +44,35 @@ int bridgeDetection(const vector<vector<int>> &adj, int source, const vector<int
     return count;
 }
 
+void connectedComponents(vector<vector<int>> &adj, vector<int> &parents, vector<int> &cc) {
+    int currentComponent = 0;
+    for (int i = 1; i < R + 1; i++) {
+        if (parents[i] == -1) {
+            parents[i] = i;
+            cc[i] = currentComponent;
+            int startTime = 0; vector<int> timeIn(R + 1, -1); vector<int> color(R + 1, 0);
+            dfsTimerParent(adj, 1, startTime, timeIn, color, parents);
+        }
+    }
+
+    for (int i = 1; i < R + 1; i++) {
+
+    }
+}
+
 void processHedgeMaze(vector<int> &component) {
-    vector<int> nodeTimeIn(R + 1);
-    vector<int> nodeColor(R + 1);
-    vector<int> nodeParent(R + 1);
+    vector<int> nodeTimeIn(R + 1, 0);
+    vector<int> nodeColor(R + 1, 0);
+    vector<int> nodeParent(R + 1, -1);
+    nodeParent[1] = 1;
     int currentTime = 0;
     dfsTimerParent(adjacent, 1, currentTime, nodeTimeIn, nodeColor, nodeParent);
 
     vector<vector<int>> bridges(R + 1, vector<int>());
     bridgeDetection(adjacent, 1, nodeTimeIn, nodeParent, bridges);
 
-    // TODO: agregar algoritmo de detección de componentes conexas usando DFS
+    nodeParent = vector<int>(R + 1, -1);
+    connectedComponents(bridges, nodeParent, component);
 }
 
 int main() {
@@ -68,7 +86,7 @@ int main() {
             adjacent[v].push_back(u);
         }
 
-        nodeComponent = vector<int>(R + 1, 0);
+        nodeComponent = vector<int>(R + 1, -1);
         processHedgeMaze(nodeComponent);
 
         for (int i = 0; i < Q; i++) {
