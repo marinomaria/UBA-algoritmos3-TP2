@@ -51,15 +51,15 @@ void processHedgeMaze(vector<int> &component) {
     int currentTime = 0;
     dfsTimerParent(adjacent, 1, currentTime, nodeTimeIn, nodeColor, nodeParent);
 
-    vector<vector<int>> bridges(R, vector<int>());
+    vector<vector<int>> bridges(R + 1, vector<int>());
     bridgeDetection(adjacent, 1, nodeTimeIn, nodeParent, bridges);
 
     // TODO: agregar algoritmo de detección de componentes conexas usando DFS
 }
 
 int main() {
-    while(cin >> R >> C >> Q) {
-        adjacent = vector<vector<int>>(R, vector<int>());
+    while(cin >> R >> C >> Q && (R != 0 or C != 0 or Q != 0)) {
+        adjacent = vector<vector<int>>(R + 1, vector<int>());
         for (int i = 0; i < C; i++) {
             int u;
             int v;
@@ -68,7 +68,7 @@ int main() {
             adjacent[v].push_back(u);
         }
 
-        nodeComponent = vector<int>(R, 0);
+        nodeComponent = vector<int>(R + 1, 0);
         processHedgeMaze(nodeComponent);
 
         for (int i = 0; i < Q; i++) {
