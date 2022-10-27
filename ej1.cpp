@@ -24,7 +24,7 @@ int bridgeDetection(const vector<vector<int>> &adj, int source, const vector<int
     int count = 0;
     for (int u : adj[source]) {
         if (parents[u] == source) {
-            bridgeDetection(adj, u, timeIn, parents, bridges);
+            count += bridgeDetection(adj, u, timeIn, parents, bridges);
         } else {
             // (source, u) is a back-edge going up
             if (timeIn[source] > timeIn[u] and parents[source] != u) {
@@ -52,11 +52,18 @@ void connectedComponents(vector<vector<int>> &adj, vector<int> &parents, vector<
             cc[i] = currentComponent;
             int startTime = 0; vector<int> timeIn(R + 1, -1); vector<int> color(R + 1, 0);
             dfsTimerParent(adj, 1, startTime, timeIn, color, parents);
+            currentComponent++;
         }
     }
 
     for (int i = 1; i < R + 1; i++) {
-
+        if (cc[i] == -1) {
+            int u = i;
+            while (parents[u] != u) {
+                u = parents[u];
+            }
+            cc[i] = cc[u];
+        }
     }
 }
 
