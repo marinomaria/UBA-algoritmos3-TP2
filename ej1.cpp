@@ -2,25 +2,30 @@
 #include <vector>
 
 using namespace std;
-int R, C, Q;
-vector<vector<int>> adjacent;
-vector<int> nodeComponent;
 
-void dfsTimerParent(const vector<vector<int>> &adj, const int source,
-                    int &currentTime, vector<int> &timeIn, vector<int> &color, vector<int> &parent) {
-    color[source] = 1;
+using Graph = vector<vector<int>>;
+
+struct dfsOutput{
+    vector<int> connectedComponents;
+    Graph bridges;
+};
+
+int R, C, Q;
+
+void dfsComponent(const Graph &adj, int source, int c, int &currentTime, vector<int> &timeIn, vector<int> &color, vector<int> &parent) {
+    color[source] = c;
     timeIn[source] = currentTime++;
+
     for (int u : adj[source]) {
         if (color[u] == 0) {
             parent[u] = source;
-            dfsTimerParent(adj, u, currentTime, timeIn, color, parent);
+            color[u] = c;
+            dfsComponent(adj, u, c, currentTime, timeIn, color, parent);
         }
     }
-    color[source] = 2;
 }
 
-int bridgeDetection(const vector<vector<int>> &adj, int source, const vector<int> &timeIn,
-                     const vector<int> &parents, vector<vector<int>> &bridges) {
+int bridgeDetection(const Graph &adj, int source, const vector<int> &timeIn, const vector<int> &parents, Graph &bridges) {
     int count = 0;
     for (int u : adj[source]) {
         if (parents[u] == source) {
@@ -44,47 +49,33 @@ int bridgeDetection(const vector<vector<int>> &adj, int source, const vector<int
     return count;
 }
 
-void connectedComponents(vector<vector<int>> &adj, vector<int> &parents, vector<int> &cc) {
-    int currentComponent = 0;
-    for (int i = 1; i < R + 1; i++) {
-        if (parents[i] == -1) {
-            parents[i] = i;
-            cc[i] = currentComponent;
-            int startTime = 0; vector<int> timeIn(R + 1, -1); vector<int> color(R + 1, 0);
-            dfsTimerParent(adj, 1, startTime, timeIn, color, parents);
-            currentComponent++;
-        }
-    }
-
-    for (int i = 1; i < R + 1; i++) {
-        if (cc[i] == -1) {
-            int u = i;
-            while (parents[u] != u) {
-                u = parents[u];
-            }
-            cc[i] = cc[u];
-        }
-    }
-}
-
-void processHedgeMaze(vector<int> &component) {
+dfsOutput dfsGraph(Graph& G) {
     vector<int> nodeTimeIn(R + 1, 0);
     vector<int> nodeColor(R + 1, 0);
     vector<int> nodeParent(R + 1, -1);
-    nodeParent[1] = 1;
+    Graph bridges(R + 1);
     int currentTime = 0;
-    dfsTimerParent(adjacent, 1, currentTime, nodeTimeIn, nodeColor, nodeParent);
+    for (int i = 1; i <= R; i++) {
+        if (nodeParent[i] == -1) {
+            nodeParent[i] = i;
+            dfsComponent(G, i, i, currentTime, nodeTimeIn, nodeColor, nodeParent);
+            bridgeDetection(G, i, nodeTimeIn, nodeParent, bridges);
+        }
+    }
 
-    vector<vector<int>> bridges(R + 1, vector<int>());
-    bridgeDetection(adjacent, 1, nodeTimeIn, nodeParent, bridges);
+    return {nodeColor, bridges};
+}
 
-    nodeParent = vector<int>(R + 1, -1);
-    connectedComponents(bridges, nodeParent, component);
+vector<int> processHedgeMaze(Graph& G) {
+    Graph bridges = dfsGraph(G).bridges;
+    vector<int> nodeComponent = dfsGraph(bridges).connectedComponents;
+
+    return nodeComponent;
 }
 
 int main() {
     while(cin >> R >> C >> Q && (R != 0 or C != 0 or Q != 0)) {
-        adjacent = vector<vector<int>>(R + 1, vector<int>());
+        Graph adjacent = Graph(R + 1);
         for (int i = 0; i < C; i++) {
             int u;
             int v;
@@ -93,14 +84,13 @@ int main() {
             adjacent[v].push_back(u);
         }
 
-        nodeComponent = vector<int>(R + 1, -1);
-        processHedgeMaze(nodeComponent);
+        vector<int> component = processHedgeMaze(adjacent);
 
         for (int i = 0; i < Q; i++) {
             int s;
             int t;
             cin >> s >> t;
-            cout << ((nodeComponent[s] == nodeComponent[t]) ? 'Y' : 'N') << endl;
+            cout << ((component[s] == component[t]) ? 'Y' : 'N') << endl;
         }
 
         cout << '-' << endl;
