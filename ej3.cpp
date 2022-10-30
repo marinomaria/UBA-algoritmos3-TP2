@@ -18,18 +18,26 @@ int dijkstra(const Graph &adj, int source, int target) {
     struct node {
         int n;
         int dist;
-
     };
-    bool operator>(const node &u, const node &v) {
-        return u.dist > v.dist;
-    }
+    class Compare
+    {
+    public:
+        bool operator() (const node &u, const node &v)
+        {
+            return u.dist > v.dist;
+        }
+    };
 
     vector<int> nodeDistance(adj.size(), INF);
     nodeDistance[source] = 0;
-    priority_queue<node, vector<node>> Q(nodeDistance.begin(), nodeDistance.end());
+    priority_queue<node, vector<node>, Compare> Q;
+    Q.push({0,0});
+    for (int i = 1; i < adj.size(); i++) {
+        Q.push({i, INF});
+    }
 
     while (!Q.empty()) {
-        int u = Q.top();
+        int u = Q.top().n;
         Q.pop();
         for (edge e : adj[u]) {
             int v = e.to;
