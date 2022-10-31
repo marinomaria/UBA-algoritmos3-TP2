@@ -65,6 +65,8 @@ int solveUsher(const Graph &G, int &boxCapacity) {
         box+=(n-1);
         }
     return usherProfit  ;
+    // Alternativa para calcular en O(1):
+    // return (maxCapacity-(1+epsilon)/(n-1);
 
 }
 
