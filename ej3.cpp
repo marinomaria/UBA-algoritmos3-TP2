@@ -12,7 +12,8 @@ struct edge {
 
 using Graph = vector<vector<edge>>;
 
-#define INF numeric_limits<int>::max()
+//#define INF numeric_limits<int>::max()
+int INF = 10000;
 int T, C, P;
 
 int dijkstra(const Graph &adj, int source, int target) {
@@ -25,7 +26,7 @@ int dijkstra(const Graph &adj, int source, int target) {
     public:
         bool operator() (const node &u, const node &v)
         {
-            return u.dist > v.dist;
+            return u.dist >= v.dist;
         }
     };
 
@@ -39,13 +40,16 @@ int dijkstra(const Graph &adj, int source, int target) {
 
     while (!Q.empty()) {
         int u = Q.top().n;
-        Q.pop();
+
         for (edge e : adj[u]) {
             int v = e.to;
             if (nodeDistance[v] > nodeDistance[u] + e.weight) {
-                nodeDistance[v] = nodeDistance[u] + e.weight;
+                int newDist = nodeDistance[u] + e.weight;
+                nodeDistance[v] = newDist;
+                Q.push({v, newDist});
             }
         }
+        Q.pop();
     }
 
     return nodeDistance[target];
@@ -54,8 +58,15 @@ int dijkstra(const Graph &adj, int source, int target) {
 int solveUsher(const Graph &G, int &boxCapacity) {
 
     int n = dijkstra(G, 0, G.size() - 1);
+    // Cree este codigo para contar bien los casos.
+    int usherProfit = 0;
+    int box = n;
+    while(box<boxCapacity){
+        usherProfit ++;
+        box+=(n-1);
+        }
+    return usherProfit  ;
 
-    return boxCapacity / (n - 1);
 }
 
 int main() {
@@ -81,8 +92,9 @@ int main() {
                 G[j].push_back({t, w});
             }
         }
-
+        //cout << "RESULTADO:" << endl;
         cout << solveUsher(G, C) << endl;
+
     }
     return 0;
 }
