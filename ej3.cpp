@@ -40,7 +40,7 @@ int dijkstra(const Graph &adj, int source, int target) {
 
     while (!Q.empty()) {
         int u = Q.top().n;
-
+        Q.pop();
         for (edge e : adj[u]) {
             int v = e.to;
             if (nodeDistance[v] > nodeDistance[u] + e.weight) {
@@ -49,7 +49,7 @@ int dijkstra(const Graph &adj, int source, int target) {
                 Q.push({v, newDist});
             }
         }
-        Q.pop();
+
     }
 
     return nodeDistance[target];
@@ -58,7 +58,6 @@ int dijkstra(const Graph &adj, int source, int target) {
 int solveUsher(const Graph &G, int &boxCapacity) {
 
     int n = dijkstra(G, 0, G.size() - 1);
-    // Cree este codigo para contar bien los casos.
     int usherProfit = 0;
     int box = n;
     while(box<boxCapacity){
@@ -92,7 +91,7 @@ int main() {
                 G[j].push_back({t, w});
             }
         }
-        //cout << "RESULTADO:" << endl;
+
         cout << solveUsher(G, C) << endl;
 
     }
