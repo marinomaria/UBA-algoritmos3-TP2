@@ -14,7 +14,6 @@ using Graph = vector<vector<edge>>;
 
 //#define INF numeric_limits<int>::max()
 int INF = 10000;
-float epsilon = 0.01;
 int T, C, P;
 
 int dijkstra(const Graph &adj, int source, int target) {
@@ -59,16 +58,15 @@ int dijkstra(const Graph &adj, int source, int target) {
 int solveUsher(const Graph &G, int &boxCapacity) {
 
     int n = dijkstra(G, 0, G.size() - 1);
-    //Idea 1:
-    //int usherProfit = 0;
-    //int box = n;
-    //while(box<boxCapacity){
-    //    usherProfit ++;
-    //    box+=(n-1);
-    //    }
-    //return usherProfit  ;
+    int usherProfit = 0;
+    int box = n;
+    while(box<boxCapacity){
+        usherProfit ++;
+        box+=(n-1);
+        }
+    return usherProfit  ;
     // Alternativa para calcular en O(1):
-    return (maxCapacity-(1+epsilon)/(n-1);
+    // return (maxCapacity-(1+epsilon)/(n-1);
 
 }
 
