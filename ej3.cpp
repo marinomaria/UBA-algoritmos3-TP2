@@ -12,27 +12,21 @@ struct edge {
 
 using Graph = vector<vector<edge>>;
 
-//#define INF numeric_limits<int>::max()
-int INF = 10000;
+#define INF numeric_limits<int>::max()
 int T, C, P;
 
-int dijkstra(const Graph &adj, int source, int target) {
-    struct node {
-        int n;
-        int dist;
-    };
-    class Compare
-    {
+vector<int> dijkstra(const Graph &adj, int source) {
+    struct node {int n; int dist;};
+    class nodeGreater {
     public:
-        bool operator() (const node &u, const node &v)
-        {
+        bool operator() (const node &u, const node &v) {
             return u.dist >= v.dist;
         }
     };
 
     vector<int> nodeDistance(adj.size(), INF);
     nodeDistance[source] = 0;
-    priority_queue<node, vector<node>, Compare> Q;
+    priority_queue<node, vector<node>, nodeGreater> Q;
     Q.push({0,0});
     for (int i = 1; i < adj.size(); i++) {
         Q.push({i, INF});
@@ -52,29 +46,26 @@ int dijkstra(const Graph &adj, int source, int target) {
 
     }
 
-    return nodeDistance[target];
+    return nodeDistance;
 }
 
 int solveUsher(const Graph &G, int &boxCapacity) {
 
-    int n = dijkstra(G, 0, G.size() - 1);
+    int minDonationRound = dijkstra(G, 0)[G.size() - 1];
     int usherProfit = 0;
-    int box = n;
-    while(box<boxCapacity){
-        usherProfit ++;
-        box+=(n-1);
+    int box = minDonationRound;
+    while(box < boxCapacity) {
+        usherProfit++;
+        box += (minDonationRound - 1);
         }
-    return usherProfit  ;
-    // Alternativa para calcular en O(1):
-    // return (maxCapacity-(1+epsilon)/(n-1);
-
+    return usherProfit;
 }
 
 int main() {
     cin >> T;
     for(int i = 0; i < T; i++) {
         cin >> C >> P;
-        // node 0 is the light usher, node P + 1 is the shadow usher
+        // We'll use the node 0 as a source usher and the node P + 1 as a target usher
         Graph G(P + 2);
         int q;
         cin >> q;
