@@ -24,21 +24,27 @@ vector<int> dijkstra(const Graph &adj, int source) {
         }
     };
 
+    // Initialize distance vector
     vector<int> nodeDistance(adj.size(), INF);
     nodeDistance[source] = 0;
+    // Initialize priority queue of node distances
     priority_queue<node, vector<node>, nodeGreater> Q;
-    Q.push({0,0});
+    Q.push({0,0}); // Source node
     for (int i = 1; i < adj.size(); i++) {
         Q.push({i, INF});
     }
 
     while (!Q.empty()) {
-        int u = Q.top().n;
+        node u = Q.top();
         Q.pop();
-        for (edge e : adj[u]) {
+        // If this node's distance is outdated better distance has been previously found, so ignore it
+        if (u.dist > nodeDistance[u.n]) {
+            continue;
+        }
+        for (edge e : adj[u.n]) {
             int v = e.to;
-            if (nodeDistance[v] > nodeDistance[u] + e.weight) {
-                int newDist = nodeDistance[u] + e.weight;
+            if (nodeDistance[v] > nodeDistance[u.n] + e.weight) {
+                int newDist = nodeDistance[u.n] + e.weight;
                 nodeDistance[v] = newDist;
                 Q.push({v, newDist});
             }
@@ -50,14 +56,11 @@ vector<int> dijkstra(const Graph &adj, int source) {
 }
 
 int solveUsher(const Graph &G, int &boxCapacity) {
-
     int minDonationRound = dijkstra(G, 0)[G.size() - 1];
-    int usherProfit = 0;
-    int box = minDonationRound;
-    while(box < boxCapacity) {
-        usherProfit++;
-        box += (minDonationRound - 1);
-        }
+    if (boxCapacity<=minDonationRound) return 0;
+    int usherProfit = (boxCapacity - minDonationRound) / (minDonationRound - 1);
+    bool extraRound = (boxCapacity - minDonationRound) % (minDonationRound - 1) > 0;
+    if (extraRound) usherProfit++;
     return usherProfit;
 }
 
