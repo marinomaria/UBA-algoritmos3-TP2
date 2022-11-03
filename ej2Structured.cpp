@@ -63,10 +63,19 @@ struct unionFind {
 
 int T, N, M;
 
-int solveTourBelt(int &n, vector<edge> m) {
+int solveTourBelt(int &n, vector<edge> &m) {
     int sumTourBeltSize = 0;
 
     sort(m.begin(), m.end(), greater<edge>());
+
+    unionFind sets(n + 1);
+
+    for (edge e : m) {
+        if (sets.find(e.u) != sets.find(e.v)) {
+            sets.unite(e.u, e.v);
+            // TODO: add checks to count tour belt size
+        }
+    }
 
     return sumTourBeltSize;
 }
