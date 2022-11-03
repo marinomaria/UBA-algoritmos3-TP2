@@ -3,11 +3,18 @@
 
 using namespace std;
 
+#define INF numeric_limits<int>::max()
+
 struct constraint {
-    // Represents constraint X[a] - X[b] ≤ c
-    int a;
+    // Represents constraint X[i] - X[j] ≤ b
+    int i;
+    int j;
     int b;
-    int c;
+};
+
+struct fishburnOutput {
+    bool isConsistent;
+    vector<int> solution;
 };
 
 int T;
@@ -17,10 +24,29 @@ ostream &operator<<(ostream &out, const vector<int> &vec) {
     return out;
 }
 
-vector<int> fishburnSolver(int &n, vector<constraint> &C, const vector<int> &D) {
-    vector<int> X(n + 1);
+fishburnOutput fishburnSolver(int &n, vector<constraint> &C, const vector<int> &D) {
+    vector<int> X(n + 1, D[D.size() - 1]);
+    bool consistent = true;
 
-    return X;
+    bool changed = true;
+    while (changed) {
+        changed = false;
+        for (constraint c : C) {
+            int k = INF; // TODO: si existe un k tal que D[k] ≤ X[c.i] + c.b elijo el k más grande y lo pongo acá
+            if (X[c.i] > X[c.j] + c.b && k != INF) {
+                X[c.j] = k;
+                changed = true;
+            }
+        }
+    }
+
+    for (constraint c : C) {
+        if (X[c.i] - X[c.j] > c.b) {
+            consistent = false;
+        }
+    }
+
+    return {consistent, X};
 }
 
 int main() {
@@ -43,7 +69,13 @@ int main() {
             D.push_back(d);
         }
 
-        cout << fishburnSolver(n, constraints, D) << endl;
+        sort(D.begin(), D.end());
+        fishburnOutput s = fishburnSolver(n, constraints, D);
+        if (s.isConsistent) {
+            cout << s.solution << endl;
+        } else {
+            cout << "insatisfactible" << endl;
+        }
 
     }
     return 0;
