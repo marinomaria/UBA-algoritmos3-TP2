@@ -1,8 +1,11 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <list>
 
 using namespace std;
+
+#define INF numeric_limits<int>::max()
 
 using Costo = unsigned long int;
 using Arista = pair<size_t,size_t>;
@@ -18,7 +21,7 @@ struct UF {
     //  m: Vector con arista mínima
     vector<int> p, s, m;
     //  h: Vector con todos los hijos
-	vector<vector<int>> h; //tiene que ser un vector [[0],[1],[2],[3]...]
+	vector<list<int>> h; //tiene que ser un vector [[0],[1],[2],[3]...]
     
     //Constructor
     UF(int n): p(n, -1), s(n, 1), m(n, INF) {} //falta el constructor de h
@@ -33,14 +36,14 @@ struct UF {
 		int arista_minima = INF;
 		for (auto i : h[v]) {
 			for (auto j : h[w]){
-				if (M[i][j] < arista_minima){arista_minima = M[i][j]}
+				if (M[i][j] < arista_minima) arista_minima = M[i][j];
 			}
 		}
-		m[v] = min(arista_minima,m[v],m[w]);
+		m[v] = min({arista_minima, m[v], m[w]});
 
         s[v] += s[w];
 		//h me enumera todos los nodos que son parte del set
-		h[v] = h[v] append h[w]; //Quiero appendear
+        h[v].splice(h[v].end(), h[w]);
     }
     
     //find: Devuelve la raiz del set
@@ -49,17 +52,12 @@ struct UF {
     }
 
     int minima_arista(int v) {
-		v = componentes.find(v);
+		v = find(v);
         return m[v];
     }
 
-	int nodos_del_set(int v) {
-		v = componentes.find(v);
-		return h[v];
-	}
-
 	int size(int v) {
-		v = componentes.find(v);
+		v = find(v);
 		return s[v];
 	}
 
@@ -75,7 +73,7 @@ int main() {
     vector<pair<Costo, Arista>> valores(m);
 
     //Lectura del vector de aristas
-    for (auto& [c, e] : valores) cin >> e.first >> e.second >> c;
+    for (auto& v : valores) cin >> v.second.first >> v.second.second >> v.first;
 
     //Ordenamiento de las aristas por peso
     sort(valores.begin(), valores.end());
@@ -86,27 +84,33 @@ int main() {
 
     //Recorre las aristas ordenadas y se queda con aquellas que unan
     //dos vértices de componentes conexas distintas, uniéndolas
-	for (int i=0; i<size(valores); i++){
-		vector<int> this_level_trees; //Acá guardo todos los árboles que fueron expandidos para este costo de arista
-		auto [c,e] = valores[i];
-        auto [i,j] = e;
-        if (componentes.find(i) != componentes.find(j)) {
-            componentes.unite(i,j);
-			this_level_trees.push_back(componentes.find(j))
+    vector<int> this_level_trees; //Acá guardo todos los árboles que fueron expandidos para este costo de arista
+	for (int i = 0; i < valores.size() - 1; i++) {
+        int c,u,v;
+        Arista e;
+		tie(c,e) = valores[i];
+        tie(u, v) = e;
+        if (componentes.find(u) != componentes.find(v)) {
+            componentes.unite(u,v);
+			this_level_trees.push_back(componentes.find(v));
         }
 		//Si es la última arista de este peso, paso a sumar todo
-		int peso_proxima_arista = valores[i+1][0];
+		int peso_proxima_arista = valores[i + 1].first;
 		if (c > peso_proxima_arista){
 			//Acá necesito convertir this_level_trees en una lista de raíces sin repetir
-			for (int i = 0; i<size(this_level_trees); i++){
-				this_level_trees[i] = componentes.find(this_level_trees[i])
+			for (int & this_level_tree : this_level_trees){
+				this_level_tree = componentes.find(this_level_tree);
 			}
-			this_level_trees = std::unique(this_level_trees) //HACER QUE ESTO ANDE
+            sort(this_level_trees.begin(), this_level_trees.end());
+            vector<int>::iterator it;
+            it = unique(this_level_trees.begin(), this_level_trees.end());
+
+            this_level_trees.resize(distance(this_level_trees.begin(),it));
 
 
 
 			for (auto t : this_level_trees){
-				if (componentes.arista_minima(t) == c) {suma_total = suma_total + componentes.size(t) }
+				if (componentes.minima_arista(t) == c) suma_total = suma_total + componentes.size(t);
 			}
 		}
     }
