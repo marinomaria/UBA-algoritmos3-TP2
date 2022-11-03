@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <list>
+#include <set>
 
 using namespace std;
 
@@ -24,16 +25,16 @@ struct unionFind {
     vector<int> parent, size, minEdge;
     vector<list<int>> descendants;
 
-    explicit unionFind(int n): parent(n, -1), size(n, 1), minEdge(n, INF), descendants(n) {}
+    explicit unionFind(int n): parent(n, -1), size(n, 1), minEdge(n, INF) {
+        for (int i = 0; i < n; i++) descendants.push_back({i});
+    }
 
+    ;
     void unite(int v, int w) {
         v = find(v); w = find(w);
-        //  if(v == w) return;
-        // No need to make it robust as unite() will be called if and only if v and w are from different sets
-        if (size[v] < size[w]) swap(v, w);
+        if (size[v] < size[w]) swap(v, w); // Make sure w is always 'smaller' than v
         parent[w] = v;
         size[v] += size[w];
-        descendants[v].splice(descendants[v].end(), descendants[w]);
 
         int newMinEdge = INF;
         for (auto i : descendants[v]) {
@@ -43,6 +44,7 @@ struct unionFind {
         }
         minEdge[v] = min({newMinEdge, minEdge[v], minEdge[w]});
 
+        descendants[v].splice(descendants[v].end(), descendants[w]);
     }
 
     int find(int v) {
@@ -70,10 +72,27 @@ int solveTourBelt(int &n, vector<edge> &m) {
 
     unionFind sets(n + 1);
 
-    for (edge e : m) {
+    vector<int> modifiedTrees;
+    for (int i = 0; i < m.size(); i++) {
+        edge e = m[i];
         if (sets.find(e.u) != sets.find(e.v)) {
             sets.unite(e.u, e.v);
-            // TODO: add checks to count tour belt size
+        }
+        modifiedTrees.push_back(sets.find(e.u));
+
+        if (i == m.size() - 1 || weight[m[i + 1].u][m[i + 1].v]) {
+            set<int> uniqueModifiedTrees;
+            for (int t : modifiedTrees) {
+                uniqueModifiedTrees.emplace(sets.find(t));
+            }
+
+            set<int>::iterator it;
+            for (it = uniqueModifiedTrees.begin(); it != uniqueModifiedTrees.end(); it++) {
+                if (sets.getMinEdge(*it) == weight[e.u][e.v]) {
+                    sumTourBeltSize += sets.getSize(*it);
+                }
+            }
+            modifiedTrees.clear();
         }
     }
 
@@ -85,12 +104,13 @@ int main() {
     for(int i = 0; i < T; i++) {
         cin >> N >> M;
         vector<edge> edges;
-        weight = Matrix(N, vector<int>(N, INF));
+        weight = Matrix(N + 1, vector<int>(N + 1, INF));
         for (int j = 0; j < M; j++) {
             int v, w, k;
             cin >> v >> w >> k;
             edges.push_back({v, w});
             weight[v][w] = k;
+            weight[w][v] = k;
         }
 
 
