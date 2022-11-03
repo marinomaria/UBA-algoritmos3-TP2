@@ -33,12 +33,16 @@ vector<int> dijkstra(const Graph &adj, int source) {
     }
 
     while (!Q.empty()) {
-        int u = Q.top().n;
+        node u = Q.top();
         Q.pop();
-        for (edge e : adj[u]) {
+//      If this node's distance is outdated better distance has been previously found, ignore
+        if (u.dist > nodeDistance[u.n]) {
+            continue;
+        }
+        for (edge e : adj[u.n]) {
             int v = e.to;
-            if (nodeDistance[v] > nodeDistance[u] + e.weight) {
-                int newDist = nodeDistance[u] + e.weight;
+            if (nodeDistance[v] > nodeDistance[u.n] + e.weight) {
+                int newDist = nodeDistance[u.n] + e.weight;
                 nodeDistance[v] = newDist;
                 Q.push({v, newDist});
             }
@@ -50,7 +54,6 @@ vector<int> dijkstra(const Graph &adj, int source) {
 }
 
 int solveUsher(const Graph &G, int &boxCapacity) {
-
     int minDonationRound = dijkstra(G, 0)[G.size() - 1];
     int usherProfit = 0;
     int box = minDonationRound;
