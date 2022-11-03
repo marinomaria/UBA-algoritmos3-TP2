@@ -15,7 +15,7 @@ struct edge {
     int v;
 
     bool operator > (const edge &other) const {
-        return (weight[u][v] < weight[other.u][other.v]);
+        return (weight[u][v] > weight[other.u][other.v]);
     }
 };
 
