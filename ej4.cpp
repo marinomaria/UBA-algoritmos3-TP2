@@ -24,6 +24,15 @@ ostream &operator<<(ostream &out, const vector<int> &vec) {
     return out;
 }
 
+int findK(const constraint &c, const vector<int> &D, const vector<int> &X) {
+    int k = INF;
+    for (int i = D.size(); i >= 0; i--) {
+        if (D[i] <= X[c.i] + c.b) k = i;
+    }
+
+    return k;
+}
+
 fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequalities, const vector<int> &D) {
     vector<int> X(variableCount + 1, D[D.size() - 1]);
     bool satisfiable = true;
@@ -32,9 +41,9 @@ fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequaliti
     while (changed) {
         changed = false;
         for (constraint c : inequalities) {
-            int k = INF; // TODO: si existe un k tal que D[k] ≤ X[c.i] + c.b elijo el k más grande y lo pongo acá
-            if (X[c.i] > X[c.j] + c.b && k != INF) {
-                X[c.j] = k;
+            int k = findK(c, D, X);
+            if (X[c.i] > X[c.j] + c.b && k < D.size()) {
+                X[c.j] = D[k];
                 changed = true;
             }
         }
