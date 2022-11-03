@@ -13,7 +13,7 @@ struct constraint {
 };
 
 struct fishburnOutput {
-    bool isConsistent;
+    bool satisfiable;
     vector<int> solution;
 };
 
@@ -24,14 +24,14 @@ ostream &operator<<(ostream &out, const vector<int> &vec) {
     return out;
 }
 
-fishburnOutput fishburnSolver(int &n, vector<constraint> &C, const vector<int> &D) {
-    vector<int> X(n + 1, D[D.size() - 1]);
-    bool consistent = true;
+fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequalities, const vector<int> &D) {
+    vector<int> X(variableCount + 1, D[D.size() - 1]);
+    bool satisfiable = true;
 
     bool changed = true;
     while (changed) {
         changed = false;
-        for (constraint c : C) {
+        for (constraint c : inequalities) {
             int k = INF; // TODO: si existe un k tal que D[k] ≤ X[c.i] + c.b elijo el k más grande y lo pongo acá
             if (X[c.i] > X[c.j] + c.b && k != INF) {
                 X[c.j] = k;
@@ -40,13 +40,13 @@ fishburnOutput fishburnSolver(int &n, vector<constraint> &C, const vector<int> &
         }
     }
 
-    for (constraint c : C) {
+    for (constraint c : inequalities) {
         if (X[c.i] - X[c.j] > c.b) {
-            consistent = false;
+            satisfiable = false;
         }
     }
 
-    return {consistent, X};
+    return {satisfiable, X};
 }
 
 int main() {
@@ -71,7 +71,7 @@ int main() {
 
         sort(D.begin(), D.end());
         fishburnOutput s = fishburnSolver(n, constraints, D);
-        if (s.isConsistent) {
+        if (s.satisfiable) {
             cout << s.solution << endl;
         } else {
             cout << "insatisfactible" << endl;
