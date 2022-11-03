@@ -57,7 +57,7 @@ vector<int> dijkstra(const Graph &adj, int source) {
 
 int solveUsher(const Graph &G, int &boxCapacity) {
     int minDonationRound = dijkstra(G, 0)[G.size() - 1];
-    if (boxCapacity<=minDonationRound) return 0;
+    if (boxCapacity <= minDonationRound) return 0;
     int usherProfit = (boxCapacity - minDonationRound) / (minDonationRound - 1);
     bool extraRound = (boxCapacity - minDonationRound) % (minDonationRound - 1) > 0;
     if (extraRound) usherProfit++;
