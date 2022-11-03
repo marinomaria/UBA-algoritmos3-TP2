@@ -85,7 +85,7 @@ int main() {
     for(int i = 0; i < T; i++) {
         cin >> N >> M;
         vector<edge> edges;
-        weight = Matrix(N, vector<int>(N, -1));
+        weight = Matrix(N, vector<int>(N, INF));
         for (int j = 0; j < M; j++) {
             int v, w, k;
             cin >> v >> w >> k;
