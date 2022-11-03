@@ -18,18 +18,18 @@ using Matrix = vector<vector<int>>;
 Matrix weight;
 
 struct unionFind {
-    vector<int> parent, setSize, minEdge;
+    vector<int> parent, size, minEdge;
     vector<list<int>> descendants;
 
-    explicit unionFind(int n): parent(n, -1), setSize(n, 1), minEdge(n, INF), descendants(n) {}
+    explicit unionFind(int n): parent(n, -1), size(n, 1), minEdge(n, INF), descendants(n) {}
 
     void unite(int v, int w) {
         v = find(v); w = find(w);
         //  if(v == w) return;
         // No need to make it robust as unite() will be called if and only if v and w are from different sets
-        if (setSize[v] < setSize[w]) swap(v, w);
+        if (size[v] < size[w]) swap(v, w);
         parent[w] = v;
-        setSize[v] += setSize[w];
+        size[v] += size[w];
         descendants[v].splice(descendants[v].end(), descendants[w]);
 
         int newMinEdge = INF;
@@ -46,14 +46,14 @@ struct unionFind {
         return parent[v] == -1 ? v : parent[v] = find(parent[v]);
     }
 
-    int minima_arista(int v) {
+    int getMinEdge(int v) {
         v = find(v);
         return minEdge[v];
     }
 
-    int size(int v) {
+    int getSize(int v) {
         v = find(v);
-        return setSize[v];
+        return size[v];
     }
 
 };
