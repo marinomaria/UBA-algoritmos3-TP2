@@ -7,15 +7,18 @@ using namespace std;
 
 #define INF numeric_limits<int>::max()
 
+using Matrix = vector<vector<int>>;
+Matrix weight;
+
 struct edge {
     int u;
     int v;
-    // int weight;
-    // Avoid redundancy by keeping an adjacency matrix with weights OR a list of edges with their weights, not both!
+
+    bool operator > (const edge &other) const {
+        return (weight[u][v] < weight[other.u][other.v]);
+    }
 };
 
-using Matrix = vector<vector<int>>;
-Matrix weight;
 
 struct unionFind {
     vector<int> parent, size, minEdge;
@@ -62,6 +65,8 @@ int T, N, M;
 
 int solveTourBelt(int &n, vector<edge> m) {
     int sumTourBeltSize = 0;
+
+    sort(m.begin(), m.end(), greater<edge>());
 
     return sumTourBeltSize;
 }
