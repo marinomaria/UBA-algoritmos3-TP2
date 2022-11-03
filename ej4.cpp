@@ -41,6 +41,7 @@ int findK(const constraint &c, const vector<int> &D, const vector<int> &X) {
 
 fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequalities, const vector<int> &D) {
     vector<int> X(variableCount + 1, D[D.size() - 1]);
+    vector<int> XIndex(variableCount + 1, D.size() - 1);
     bool satisfiable = true;
 
     bool changed;
@@ -51,6 +52,7 @@ fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequaliti
             int k = findK(c, D, X);
             if (X[c.j] > X[c.i] + c.b && k < D.size()) {
                 X[c.j] = D[k];
+                XIndex[c.j] = k;
                 changed = true;
             }
         }
@@ -63,7 +65,7 @@ fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequaliti
         }
     }
 
-    return {satisfiable, tail(X)};
+    return {satisfiable, tail(XIndex)};
 }
 
 int main() {
