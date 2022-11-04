@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <list>
 #include <set>
+#include <limits>
 
 using namespace std;
 
@@ -80,7 +81,7 @@ int solveTourBelt(int &n, vector<edge> &m) {
         }
         modifiedTrees.push_back(sets.find(e.u));
 
-        if (i == m.size() - 1 || weight[m[i + 1].u][m[i + 1].v]) {
+        if (i == m.size() - 1 ||  weight[e.u][e.v] > weight[m[i + 1].u][m[i + 1].v]) {
             set<int> uniqueModifiedTrees;
             for (int t : modifiedTrees) {
                 uniqueModifiedTrees.emplace(sets.find(t));
