@@ -41,6 +41,7 @@ int findK(const constraint &c, const vector<int> &D, const vector<int> &X) {
 
 fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequalities, const vector<int> &D) {
     vector<int> X(variableCount + 1, D[D.size() - 1]);
+    // XIndex[i] holds the index of the vector D that corresponds to the X[i] value
     vector<int> XIndex(variableCount + 1, D.size() - 1);
     bool satisfiable = true;
 
@@ -58,13 +59,14 @@ fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequaliti
         }
     } while (changed);
 
+    // Check if any constraint is violated
     for (int l = 1; l <= inequalities.size(); l++) {
         constraint c = inequalities[l];
         if (X[c.j] - X[c.i] > c.b) {
             satisfiable = false;
         }
     }
-
+    // Return only the tail of the solution because everything is one-indexed
     return {satisfiable, tail(XIndex)};
 }
 
@@ -75,7 +77,7 @@ int main() {
         cin >> k >> n >> m;
 
         vector<constraint> constraints;
-        constraints.push_back({-1,-1,-1});
+        constraints.push_back({-1,-1,-1}); // Push constraint 0 to keep everything one-indexed
         for (int j = 0; j < k; j++) {
             int a, b, c;
             cin >> a >> b >> c;
@@ -83,7 +85,7 @@ int main() {
         }
 
         vector<int> D;
-        D.push_back(-1);
+        D.push_back(-1); // Push fake D[0] to keep everything one-indexed
         for (int l = 0; l < m; l++) {
             int d;
             cin >> d;
