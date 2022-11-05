@@ -48,7 +48,7 @@ fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequaliti
     bool changed;
     do {
         changed = false;
-        for (int l = 1; l <= inequalities.size(); l++) {
+        for (int l = 1; l < inequalities.size(); l++) {
             constraint c = inequalities[l];
             int k = findK(c, D, X);
             if (X[c.j] > X[c.i] + c.b && k < D.size()) {
@@ -60,7 +60,7 @@ fishburnOutput fishburnSolver(int &variableCount, vector<constraint> &inequaliti
     } while (changed);
 
     // Check if any constraint is violated
-    for (int l = 1; l <= inequalities.size(); l++) {
+    for (int l = 1; l < inequalities.size(); l++) {
         constraint c = inequalities[l];
         if (X[c.j] - X[c.i] > c.b) {
             satisfiable = false;
