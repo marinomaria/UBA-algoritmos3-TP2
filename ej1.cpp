@@ -77,8 +77,7 @@ int main() {
     while(cin >> R >> C >> Q && (R != 0 or C != 0 or Q != 0)) {
         Graph adjacent = Graph(R + 1);
         for (int i = 0; i < C; i++) {
-            int u;
-            int v;
+            int u, v;
             cin >> u >> v;
             adjacent[u].push_back(v);
             adjacent[v].push_back(u);
@@ -87,8 +86,7 @@ int main() {
         vector<int> component = processHedgeMaze(adjacent);
 
         for (int i = 0; i < Q; i++) {
-            int s;
-            int t;
+            int s, t;
             cin >> s >> t;
             cout << ((component[s] == component[t]) ? 'Y' : 'N') << endl;
         }
