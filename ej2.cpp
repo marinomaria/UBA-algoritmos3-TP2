@@ -27,6 +27,7 @@ struct unionFind {
     vector<list<int>> descendants;
 
     explicit unionFind(int n): parent(n, -1), size(n, 1), minEdge(n, INF) {
+        // Initialize each descendants list with each node as its descendant.
         for (int i = 0; i < n; i++) descendants.push_back({i});
     }
 
@@ -81,7 +82,10 @@ int solveTourBelt(int &n, vector<edge> &m) {
         }
         modifiedTrees.push_back(sets.find(e.u));
 
+        // If this is the last edge of weight weight[e.u][e.v] (i.e. the following one is smaller)
         if (i == m.size() - 1 ||  weight[e.u][e.v] > weight[m[i + 1].u][m[i + 1].v]) {
+
+            // Grab unique trees
             set<int> uniqueModifiedTrees;
             for (int t : modifiedTrees) {
                 uniqueModifiedTrees.emplace(sets.find(t));
@@ -89,6 +93,7 @@ int solveTourBelt(int &n, vector<edge> &m) {
 
             set<int>::iterator it;
             for (it = uniqueModifiedTrees.begin(); it != uniqueModifiedTrees.end(); it++) {
+                // Tree is Tour Belt <=> the weight of its minimum edge matches this level's weight
                 if (sets.getMinEdge(*it) == weight[e.u][e.v]) {
                     sumTourBeltSize += sets.getSize(*it);
                 }
